@@ -7,9 +7,9 @@ models.Base.metadata.create_all(bind=engine)
 
 app=FastAPI()
 
-@app.post("/users/",response_model=schemas.UserResponse)
-def create_user(user:schemas.UserCreate,db:Session=Depends(get_db)):
-    return crud.create_user(db,user)
+@app.post("/users/bulk",response_model=list[schemas.UserResponse])
+def create_user(users:list[schemas.UserCreate],db:Session=Depends(get_db)):
+    return crud.create_user(db,users) 
 
 @app.get("/users/{user_id}",response_model=schemas.UserResponse)
 def read_user(user_id:int,db:Session=Depends(get_db)):
@@ -19,9 +19,8 @@ def read_user(user_id:int,db:Session=Depends(get_db)):
     return user
 
 @app.put("/users/{user_id}",response_model=schemas.UserResponse)
-
 def update_user(user_id:int,user:schemas.UserCreate,db:Session=Depends(get_db)):
-    updated_user=crud.update_user(db,user_id,user)
+    updated_user=crud.update_user(db,user_id,user) 
 
     if not updated_user:
         raise HTTPException(status_code=404,detail="user not found")
